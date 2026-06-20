@@ -1,45 +1,43 @@
+# src/financial_researcher/crew.py
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
-from crewai.agents.agent_builder.base_agent import BaseAgent
-
+from crewai_tools import SerperDevTool
 
 @CrewBase
-class FinancialResearcher():
-    """FinancialResearcher crew"""
-
-    agents: list[BaseAgent]
-    tasks: list[Task]
+class ResearchCrew():
+    """Research crew for comprehensive topic analysis and reporting"""
 
     @agent
     def researcher(self) -> Agent:
         return Agent(
-            config=self.agents_config['researcher'], # type: ignore[index]
-            verbose=True
+            config=self.agents_config['researcher'],
+            verbose=True,
+            tools=[SerperDevTool()]
         )
 
     @agent
-    def reporting_analyst(self) -> Agent:
+    def analyst(self) -> Agent:
         return Agent(
-            config=self.agents_config['reporting_analyst'], # type: ignore[index]
+            config=self.agents_config['analyst'],
             verbose=True
         )
 
     @task
     def research_task(self) -> Task:
         return Task(
-            config=self.tasks_config['research_task'], # type: ignore[index]
+            config=self.tasks_config['research_task']
         )
 
     @task
-    def reporting_task(self) -> Task:
+    def analysis_task(self) -> Task:
         return Task(
-            config=self.tasks_config['reporting_task'], # type: ignore[index]
-            output_file='report.md'
+            config=self.tasks_config['analysis_task'],
+            output_file='output/report.md'
         )
 
     @crew
     def crew(self) -> Crew:
-        """Creates the FinancialResearcher crew"""
+        """Creates the research crew"""
         return Crew(
             agents=self.agents,
             tasks=self.tasks,
