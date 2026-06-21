@@ -6,6 +6,9 @@ research_task:
     3. Major challenges and opportunities
     4. Recent news and events
     5. Future outlook and potential developments
+    6. Use the Stock Financial Data Lookup tool with ticker symbol {ticker} to
+       retrieve accurate, real-time quantitative data (current price, market cap,
+       P/E ratio, 52-week range) and include these exact figures in your findings.
 
     Make sure to organize your findings in a structured format with clear sections.
   expected_output: >

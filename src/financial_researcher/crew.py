@@ -2,6 +2,7 @@
 from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import SerperDevTool
+from financial_researcher.tools.custom_tool import StockDataTool
 
 @CrewBase
 class ResearchCrew():
@@ -12,7 +13,7 @@ class ResearchCrew():
         return Agent(
             config=self.agents_config['researcher'],
             verbose=True,
-            tools=[SerperDevTool()]
+            tools=[SerperDevTool(), StockDataTool()]
         )
 
     @agent
