@@ -3,6 +3,7 @@ from crewai import Agent, Crew, Process, Task
 from crewai.project import CrewBase, agent, crew, task
 from crewai_tools import SerperDevTool
 from financial_researcher.tools.custom_tool import StockDataTool
+from financial_researcher.models import CompanyReport
 
 @CrewBase
 class ResearchCrew():
@@ -33,7 +34,7 @@ class ResearchCrew():
     def analysis_task(self) -> Task:
         return Task(
             config=self.tasks_config['analysis_task'],
-            output_file='output/report.md'
+            output_pydantic=CompanyReport
         )
 
     @crew

@@ -1,10 +1,39 @@
 #!/usr/bin/env python
 # src/financial_researcher/main.py
 import os
-import shutil
 from financial_researcher.crew import ResearchCrew
+from financial_researcher.models import CompanyReport
 
 os.makedirs('output', exist_ok=True)
+
+
+def format_report_as_markdown(report: CompanyReport) -> str:
+    """Convert the validated structured report into a polished markdown document."""
+    return f"""# Financial Report: {report.company_name}
+
+## Executive Summary
+{report.executive_summary}
+
+## Current Status & Financial Health
+{report.current_status}
+
+## Historical Performance
+{report.historical_performance}
+
+## Challenges & Opportunities
+{report.challenges_and_opportunities}
+
+## Recent News & Events
+{report.recent_news}
+
+## Future Outlook
+{report.future_outlook}
+
+---
+
+**Disclaimer:** {report.disclaimer}
+"""
+
 
 def run():
     """
@@ -26,14 +55,17 @@ def run():
 
         result = ResearchCrew().crew().kickoff(inputs=info)
 
-        # Rename the generic report.md so it isn't overwritten
-        # by the next company's run
+        # result.pydantic is a validated CompanyReport — disclaimer is GUARANTEED present
+        report_markdown = format_report_as_markdown(result.pydantic)
+
         final_path = f"output/{info['ticker']}_report.md"
-        shutil.move("output/report.md", final_path)
+        with open(final_path, "w") as f:
+            f.write(report_markdown)
 
         print(f"\nReport for {info['company']} saved to: {final_path}")
 
     print("\n\nAll reports complete!")
+
 
 if __name__ == "__main__":
     run()
