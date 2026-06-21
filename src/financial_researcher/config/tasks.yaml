@@ -26,14 +26,19 @@ analysis_task:
     3. Provide insightful analysis of trends and patterns
     4. Offer a market outlook for the company
     5. Be formatted in a professional, easy-to-read style with clear headings
+    6. Extract and report the exact numeric values for current price, market cap,
+       P/E ratio, 52-week high, and 52-week low from the stock data found in the
+       research. These must be actual numbers (e.g., 195.89), not text descriptions.
 
     You must also include a clear, substantive disclaimer stating that this report
     is for informational purposes only and should not be used as the basis for
     trading or investment decisions.
   expected_output: >
-    A structured report on {company} including an executive summary, current status,
-    historical performance, challenges and opportunities, recent news, future outlook,
-    and a mandatory disclaimer explaining the report should not be used for trading decisions.
+    A structured report on {company} including the exact numeric stock metrics
+    (current price, market cap, P/E ratio, 52-week high/low), an executive summary,
+    current status, historical performance, challenges and opportunities, recent news,
+    future outlook, and a mandatory disclaimer stating the report should not be used
+    for trading decisions.
   agent: analyst
   context:
     - research_task
