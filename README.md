@@ -1,54 +1,147 @@
-# FinancialResearcher Crew
 
-Welcome to the FinancialResearcher Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+ Financial Researcher - AI-Powered Multi-Agent Financial Analysis
 
-## Installation
+An AI agent system that automates company financial research and report writing, built with [CrewAI](https://www.crewai.com/). Give it a company name and stock ticker, and two specialized AI agents - a researcher and an analyst - collaborate to produce a polished, structured financial report in minutes instead of the 30-60+ minutes this would typically take a human analyst.
 
-Ensure you have Python >=3.10 <3.14 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+## The Problem
 
-First, if you haven't already, install uv:
+Researching a company's financial health typically means manually cross-referencing multiple sources: news articles, investor relations pages, and live stock data - then synthesizing all of it into a coherent report. This is repetitive, time-consuming, and easy to do inconsistently across different companies or analysts.
+
+## The Solution
+
+This project simulates a small research team using AI agents with distinct roles:
+
+- **Researcher Agent** - gathers qualitative information via web search and pulls **live, real-time quantitative data** (stock price, market cap, P/E ratio, 52-week range) directly from Yahoo Finance using a custom tool
+- **Analyst Agent** - synthesizes the researcher's findings into a polished, professional report with an executive summary, key insights, and a market outlook
+
+The two agents pass context between each other automatically, the same way a junior researcher would hand off findings to a senior analyst for write-up.
+
+## How It Works (Architecture)
+User Input (company + ticker)
+
+│
+
+▼
+
+┌─────────────────────┐
+
+│  Researcher Agent    │── uses ──▶ Web Search Tool (Serper)
+
+│  (research_task)     │── uses ──▶ Live Stock Data Tool (yfinance)
+
+└─────────┬────────────┘
+
+│ (findings passed as context)
+
+▼
+
+┌─────────────────────┐
+
+│  Analyst Agent        │
+
+│  (analysis_task)      │
+
+└─────────┬────────────┘
+
+▼
+
+output/{TICKER}_report.md
+
+Built on **CrewAI's sequential process** - the researcher's output flows directly into the analyst's prompt via task context, with no manual handoff required.
+
+## Tech Stack
+
+- **[CrewAI](https://www.crewai.com/)** - multi-agent orchestration framework
+- **OpenAI GPT-4o-mini** - LLM powering both agents
+- **SerperDevTool** - web search (Google Search API)
+- **yfinance** - custom tool for live, real-time financial data (no API key required)
+- **Pydantic** - structured tool input validation
+- **uv** — Python dependency and environment management
+
+## Project Structure
+financial_researcher/
+
+├── src/financial_researcher/
+
+│   ├── config/
+
+│   │   ├── agents.yaml      # Agent role/goal/backstory definitions
+
+│   │   └── tasks.yaml       # Task descriptions and dependencies
+
+│   ├── tools/
+
+│   │   └── custom_tool.py   # Custom live stock data tool (yfinance)
+
+│   ├── crew.py               # Agent/task/crew wiring
+
+│   └── main.py               # Entry point — handles user input and execution
+
+├── output/                   # Generated reports (per company)
+
+├── pyproject.toml
+
+└── README.md
+
+## Setup & Installation
+
+**Prerequisites:** Python 3.10–3.13, [uv](https://docs.astral.sh/uv/)
 
 ```bash
-pip install uv
-```
+# Clone the repo
+git clone https://github.com/<your-username>/financial_researcher.git
+cd financial_researcher
 
-Next, navigate to your project directory and install the dependencies:
-
-(Optional) Lock the dependencies and install them by using the CLI command:
-```bash
+# Install dependencies
 crewai install
 ```
-### Customizing
 
-**Add your `OPENAI_API_KEY` into the `.env` file**
+Create a `.env` file in the project root with your API keys:
+OPENAI_API_KEY=your_openai_key_here
 
-- Modify `src/financial_researcher/config/agents.yaml` to define your agents
-- Modify `src/financial_researcher/config/tasks.yaml` to define your tasks
-- Modify `src/financial_researcher/crew.py` to add your own logic, tools and specific args
-- Modify `src/financial_researcher/main.py` to add custom inputs for your agents and tasks
+SERPER_API_KEY=your_serper_key_here
 
-## Running the Project
+- Get an OpenAI key at [platform.openai.com](https://platform.openai.com)
+- Get a free Serper key (2,500 free searches) at [serper.dev](https://serper.dev)
 
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
+## Usage
 
 ```bash
-$ crewai run
+crewai run
 ```
 
-This command initializes the financial_researcher Crew, assembling the agents and assigning them tasks as defined in your configuration.
+You'll be prompted to enter how many companies to research, followed by each company's name and ticker symbol:
+How many companies do you want to research? 2
+Company 1:
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+Enter the company name (e.g., Apple): Apple
 
-## Understanding Your Crew
+Enter the stock ticker symbol (e.g., AAPL): AAPL
+Company 2:
 
-The financial_researcher Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+Enter the company name (e.g., Apple): Tesla
 
-## Support
+Enter the stock ticker symbol (e.g., AAPL): TSLA
 
-For support, questions, or feedback regarding the FinancialResearcher Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
+Reports are saved to `output/{TICKER}_report.md`.
 
-Let's create wonders together with the power and simplicity of crewAI.
+## Sample Output
+
+See [`output/sample_report.md`](output/sample_report.md) for a full example report on Apple Inc.
+
+## Known Limitations & Future Improvements
+
+This project is functional end-to-end, but I'm actively aware of (and improving) a few things:
+
+- **Ticker symbols must be entered manually** - there's currently no automatic company-name-to-ticker resolution. A future version could add a lookup tool for this.
+- **Source date consistency** - since the researcher pulls from both live web search and live financial data, occasionally older cached search results can surface alongside current data. Planned fix: enforce recency filtering on search results.
+- **Compliance language enforcement** - the analyst is currently *instructed* (not strictly enforced) to include a disclaimer that the report shouldn't be used for trading decisions. A planned improvement is moving to a structured Pydantic output schema with a required disclaimer field, rather than relying purely on prompt instruction-following.
+- **Sequential execution** - companies are currently researched one at a time. For larger batches, this could be parallelized using CrewAI's async task execution.
+
+## What This Project Demonstrates
+
+- Multi-agent system design and orchestration (role-based agent collaboration, not a single monolithic LLM call)
+- Custom tool development with typed Pydantic schemas and defensive error handling
+- Prompt engineering - structured task decomposition for consistent, complete outputs
+- Practical debugging of Python packaging/environment issues in a real dev workflow
+- Awareness of LLM reliability limitations and a concrete plan to address them
